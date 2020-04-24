@@ -135,8 +135,6 @@ class Variable(object):
         current_probability_distribution_table = {}
         probability_list = []
         for assignment, probability_values in self.probability_table.items():
-            # print(assignment)
-            # print(probability_value)
             if not self.parents:
                 probability_list = list(probability_values)
                 self.marginal_probabilities = probability_list
