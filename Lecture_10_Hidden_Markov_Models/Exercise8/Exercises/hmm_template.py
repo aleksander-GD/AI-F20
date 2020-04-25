@@ -42,7 +42,7 @@ def main():
         print("Observations: {}".format(' '.join(map(str, observations[1:]))))
 
         probability = compute_forward(states, observations, transitions, emissions)
-        print("Probability: {}".format(probability))
+        print("Probability: {:.10f}".format(probability))
 
         path = compute_viterbi(states, observations, transitions, emissions)
         print("Path: {}".format(' '.join(path)))
@@ -53,13 +53,85 @@ def main():
 def inclusive_range(a, b):
     return range(a, b + 1)
 
-# https://gist.github.com/dougalsutherland/1329976
+
 def compute_forward(states, observations, transitions, emissions):
-    pass
+    big_n = len(states) - 2
+    big_t = len(observations) - 1
+
+    final_state = big_n + 1
+    size_of_observations = big_t
+
+    forward = 5 * np.ones((big_n + 2, big_t + 1))
+
+    for state in inclusive_range(1, big_n):
+        ob1 = observations[1]
+        trans = transitions[0, state]
+        emis = emissions[state, ob1]
+        forward[state, 1] = trans * emis
+
+    for time_step in inclusive_range(2, big_t):
+        for state in inclusive_range(1, big_n):
+            result = 0
+            for s_prime in inclusive_range(1, big_n):
+                result += forward[s_prime, time_step - 1] * transitions[s_prime, state] * emissions[
+                    state, observations[time_step]]
+            forward[state, time_step] = result
+
+    computed_forward_probability = 0
+    for inner_state in inclusive_range(1, big_n):
+        computed_forward_probability += (
+                    forward[inner_state, size_of_observations] * transitions[inner_state, final_state])
+
+    return computed_forward_probability
 
 
 def compute_viterbi(states, observations, transitions, emissions):
-    return []
+    big_n = len(states) - 2
+    big_t = len(observations) - 1
+
+    viterbi = 5 * np.ones((big_n + 2, big_t + 1))
+
+    for state in inclusive_range(1, big_n):
+        ob1 = observations[1]
+        trans = transitions[0, state]
+        emis = emissions[state, ob1]
+        viterbi[state, 1] = trans * emis
+
+    for time_step in inclusive_range(2, big_t):
+        for state in inclusive_range(1, big_n):
+            result = 0
+            for s_prime in inclusive_range(1, big_n):
+                result += viterbi[s_prime, time_step - 1] * transitions[s_prime, state] * emissions[
+                    state, observations[time_step]]
+            viterbi[state, time_step] = result
+
+    path = []
+    probability_list = []
+    take_path_list = []
+    for time_step in inclusive_range(1, big_t):
+        probability = 0
+        for_argmax = None
+        maxi = 0
+        for state in inclusive_range(1, big_n):
+            for_argmax = viterbi[state, time_step]
+            if time_step > 1:
+                ob1 = observations[1]
+                trans = transitions[0, state]
+                emis = emissions[state, ob1]
+                probability = trans * emis
+                maxi += probability * for_argmax
+
+            for_argmax = viterbi[state, time_step]
+            take_path_list.append(state)
+            probability_list.append(for_argmax)
+
+            if len(probability_list) > 1 and len(take_path_list) > 1:
+                max_value = argmax(probability_list)
+                state_pos = take_path_list.pop(max_value)
+                path.append(states[state_pos])
+                probability_list.clear()
+                take_path_list.clear()
+    return path
 
 
 def argmax(sequence):
@@ -70,3 +142,24 @@ def argmax(sequence):
 
 if __name__ == '__main__':
     main()
+
+'''
+    for time_step_t in inclusive_range(1, big_t):
+
+        take_path_list = []
+
+        for state_s in inclusive_range(1, big_n):
+
+            # probability = transitions[state_s - 1, state_s] * emissions[state_s, observations[time_step_t]]
+            take_path_list.append(state_s)
+            probability_list.append(probability)
+
+            if len(probability_list) > 1 and len(take_path_list) > 1:
+                max_value = argmax(probability_list)
+                state_pos = take_path_list.pop(max_value)
+                path.append(states[state_pos])
+                probability_list.clear()
+                take_path_list.clear()
+
+    return path
+'''
