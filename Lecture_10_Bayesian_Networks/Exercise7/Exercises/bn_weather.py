@@ -267,31 +267,27 @@ class BayesianNetwork(object):
 
         value_dict = {}
 
-        for value in values:  # Itererer variabel listen som gives med i metoden (values)
-            if value in self.varsMap:  # checker om nuværende variabel er i variabel dikten "self.varsMap"
-                variable = self.varsMap[value]  # Gemmer variablen i en variabel så den kan arbejdes med.
-                name = variable.get_name()  # Får navnet på variablen.
+        for value in values:
+            if value in self.varsMap:
+                variable = self.varsMap[value]
+                name = variable.get_name()
                 index = variable.get_assignment_index(
-                    values[value])  # får indexet på variablens assignment (true (1) eller false (0))
-                parents = variable.get_parents()  # får variablens forældre.
-                if parents:  # variablen har parents
-                    if len(parents) > 1:  # hvis længden af parents er længere end 1.
-                        key = ""  # tuple som holder ('true',) / ('false',) som nøgle til at tilgå værdierne i probability table
+                    values[value])
+                parents = variable.get_parents()
+                if parents:
+                    if len(parents) > 1:
+                        assignment_key = []
                         for parent in parents:
-                            probability = parent.probability_table  # får forældrens probability table
-                            parentName = parent.get_name()  # får forældrens navn
-                            parentIndex = parent.get_assignment_index(
-                                values[parentName])  # får indexet for forældrens assignment (1 eller 0)
-                            if key:  # hvis nøglen allerede har en værdi ('true',) eller ('false',)
-                                temp = list(probability)[parentIndex]
-                                key = key + temp
-                            else:  # hvis nøglen er tom
-                                key = list(probability)[parentIndex]
-                        probability = variable.probability_table  # får nuværende variabels probability table
-                        numbers = probability[
-                            key]  # bruger nøglen til at vælge det rigtige værdi sæt i tuple form, eksempel (0.1, 0.9)
-                        prob = numbers[index]  # bruger indexet til at få den rigtige værdi fra værdi sættet
-                        value_dict[name] = prob  # tilføjer til value dict
+                            parentName = parent.get_name()
+                            parentIndex = parent.get_assignment_index(values[parentName])
+                            assignment = parent.get_assignments()
+                            for boolean, assignment_index in assignment.items():
+                                if assignment_index == parentIndex:
+                                    assignment_key.append(boolean)
+                        probability = variable.probability_table
+                        numbers = probability[tuple(assignment_key)]
+                        prob = numbers[index]
+                        value_dict[name] = prob
                     else:
                         for parent in parents:
                             probability = variable.probability_table

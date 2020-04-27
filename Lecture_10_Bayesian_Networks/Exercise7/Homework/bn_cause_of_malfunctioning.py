@@ -172,7 +172,6 @@ class Variable(object):
                 row_two_column_two = probability[1]
                 row_two_column_one = probability[0]
 
-
         false_sum = row_one_column_one * row_value_one + (row_two_column_one * row_value_two)
         true_sum = row_one_column_two * row_value_one + (row_two_column_two * row_value_two)
 
@@ -273,26 +272,41 @@ class BayesianNetwork(object):
 
         value_dict = {}
 
-        for value in values:  # Itererer variabel listen som gives med i metoden (values)
-            if value in self.varsMap:  # checker om nuværende variabel er i variabel dikten "self.varsMap"
-                variable = self.varsMap[value]  # Gemmer variablen i en variabel så den kan arbejdes med.
-                name = variable.get_name()  # Får navnet på variablen.
+        for value in values:
+            if value in self.varsMap:
+                variable = self.varsMap[value]
+                name = variable.get_name()
                 index = variable.get_assignment_index(
-                    values[value])  # får indexet på variablens assignment (true (1) eller false (0))
-                parents = variable.get_parents()  # får variablens forældre.
-                if parents:  # variablen har parents
-                    for parent in parents:
+                    values[value])
+                parents = variable.get_parents()
+                if parents:
+                    if len(parents) > 1:
+                        assignment_key = []
+                        for parent in parents:
+                            parentName = parent.get_name()
+                            parentIndex = parent.get_assignment_index(values[parentName])
+                            assignment = parent.get_assignments()
+                            for boolean, assignment_index in assignment.items():
+                                if assignment_index == parentIndex:
+                                    assignment_key.append(boolean)
                         probability = variable.probability_table
-                        parentName = parent.get_name()
-                        parentIndex = parent.get_assignment_index(values[parentName])
-                        key = list(probability)[parentIndex]
-                        numbers = probability[key]
+                        numbers = probability[tuple(assignment_key)]
                         prob = numbers[index]
                         value_dict[name] = prob
-                else:
+                    else:
+                        for parent in parents:
+                            probability = variable.probability_table
+                            parentName = parent.get_name()
+                            parentIndex = parent.get_assignment_index(values[parentName])
 
+                            key = list(probability)[parentIndex]
+                            numbers = probability[key]
+                            prob = numbers[index]
+                            value_dict[name] = prob
+                else:
+                    index = 0
                     probability = variable.probability_table
-                    key = list(probability)[()]
+                    key = list(probability)[index - 1]
                     numbers = probability[key]
                     prob = numbers[index]
                     value_dict[name] = prob
@@ -432,6 +446,9 @@ def car():
     t1 = {(): (0.7, 0.3)}
     t2 = {(): (0.8, 0.2)}
     t3 = {(): (0.7, 0.3)}
+    # t1 = {('false'): (0.7), ('true'): (0.3)}
+    # t2 = {('false'): (0.8), ('true'): (0.2)}
+    # t3 = {('false'): (0.7), ('true'): (0.3)}
     t4 = {('false',): (0.9, 0.1), ('true',): (0.3, 0.7)}
     t5 = {
         ('false', 'false'): (0.3, 0.7),

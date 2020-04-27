@@ -1,5 +1,5 @@
 import random
-from Lecture_6.Exercise4.Exercise import random_selction_methods
+from Lecture_6_Local_Search.Exercise4.Exercise import random_selction_methods
 
 p_mutation = 0.2
 num_of_generations = 30

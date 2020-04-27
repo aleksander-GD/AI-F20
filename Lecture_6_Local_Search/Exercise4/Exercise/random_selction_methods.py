@@ -47,13 +47,13 @@ def random_selection(population, fitness_fn):
                 parents.append(member)
             return parents
         else:  # gå igennem listen af procenter. Hvis random værdien er lavere end entry, tilføj individ til parents.
-            for entry in ordered_fitness_percentage:
-                if (pick_parents <= entry and ordered_population[
-                    ordered_fitness_percentage.index(entry)] not in seen and ordered_fitness[
-                    ordered_fitness_percentage.index(entry)] != 0):
-                    parents.append(ordered_population[ordered_fitness_percentage.index(entry)])
+            for procent in ordered_fitness_percentage:
+                if (pick_parents <= procent and ordered_population[
+                    ordered_fitness_percentage.index(procent)] not in seen and ordered_fitness[
+                    ordered_fitness_percentage.index(procent)] != 0):
+                    parents.append(ordered_population[ordered_fitness_percentage.index(procent)])
                     seen.append(
-                        ordered_population[ordered_fitness_percentage.index(entry)])  # for at undgå duplikerede nøgler
+                        ordered_population[ordered_fitness_percentage.index(procent)])  # for at undgå duplikerede nøgler
                     break
 
     print(parents)

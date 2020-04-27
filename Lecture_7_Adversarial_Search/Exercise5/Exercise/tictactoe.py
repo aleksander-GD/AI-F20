@@ -88,6 +88,15 @@ def utility_of(state):
             return -1
     return 0
 
+def check_players_turn(state):
+    count = 0
+
+    for board_entry in state:
+        if board_entry == 'O' or board_entry == 'X': # Hvis den finder et O eller X så springer den pladsen over
+            continue
+        count += 1
+    if count % 2 == 1:
+        return True
 
 def successors_of(state):
     """
@@ -97,23 +106,16 @@ def successors_of(state):
    """
 
     # Figure out whos' turn it is. if count uneven, X turn.
-    count = 0
-    for entry in state:
-        if entry == 'O' or entry == 'X': # Hvis den finder et O eller X så springer den pladsen over
-            continue
-        count += 1
-    max_turn = False
-    if count % 2 == 1:
-        max_turn = True
 
     # Generate valid moves:
+    max_turn = check_players_turn(state) # Check whos turn it is, if the count is uneven, then it will be Xs turn
     valid_moves = []
-    for i in range(len(state)):
-        if state[i] == 'O' or state[i] == 'X':
+    for state_index in range(len(state)):
+        if state[state_index] == 'O' or state[state_index] == 'X':
             continue
         new_state = state.copy()
-        new_state[i] = 'X' if max_turn else 'O'
-        valid_moves.append((i, new_state))
+        new_state[state_index] = 'X' if max_turn else 'O'
+        valid_moves.append((state_index, new_state))
 
 
 

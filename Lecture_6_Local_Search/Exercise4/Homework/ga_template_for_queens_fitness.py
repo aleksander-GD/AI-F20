@@ -1,6 +1,6 @@
 import random
 
-from Lecture_6.Exercise4.Homework import queens_fitness
+from Lecture_6_Local_Search.Exercise4.Homework import queens_fitness
 
 # import sys
 # sys.path.insert(0, '/Lecture_6')
@@ -79,13 +79,13 @@ def mutate(individual):
 
     mutation = []
     numbers = list(range(1, 9))
-    for i in individual:  # Remove duplicates
-        if i not in mutation:  #
-            mutation.append(i)  #
+    for number in individual:  # Remove duplicates
+        if number not in mutation:  #
+            mutation.append(number)  #
 
-    for n in numbers:  # add the missing numbers
-        if n not in mutation:  #
-            mutation.append(n)  #
+    for number in numbers:  # add the missing numbers
+        if number not in mutation:  #
+            mutation.append(number)  #
     random.shuffle(mutation)  # Shuffle
 
     return tuple(mutation)
@@ -108,34 +108,32 @@ def random_selection(population, fitness_fn):
     fitness_of_each = {}
     sum_of_fitness = 0
 
-    for member in ordered_population:
-        fitness_of_each[member] = (fitness_fn(member))
-        sum_of_fitness += fitness_of_each[member]
+    for member_of_population in ordered_population:
+        fitness_of_each[member_of_population] = (fitness_fn(member_of_population))
+        sum_of_fitness += fitness_of_each[member_of_population]
     percentage_of_each = {}
     parents = []
 
-    for key, value in sorted(fitness_of_each.items(), key=lambda x: x[1],
-                             reverse=True):  # sort dict before loop, descending
+    for population, fitness in sorted(fitness_of_each.items(), key=lambda x: x[1],
+                                      reverse=True):  # sort dict before loop, descending
         percentage_of_each[
-            key] = value / sum_of_fitness * 100
-    seen = []
+            population] = fitness / sum_of_fitness * 100
+    seen_population_list = []
     min_percent = 0
     max_percent = sum(percentage_of_each.values())
 
     while not len(parents) >= 2:
-
         if len(percentage_of_each) == 2:
-            for key in percentage_of_each.keys():
-                parents.append(key)
+            for population in percentage_of_each.keys():
+                parents.append(population)
             return parents
         else:
-
-            for key, value in percentage_of_each.items():
+            for population, percentage_of_population in percentage_of_each.items():
                 pick_parents = random.uniform(min_percent, max_percent)
-                if pick_parents >= value and not (len(parents) == 2) and key not in seen:
-                    parents.append(key)
-                    seen.append(key)
-                    max_percent -= value
+                if pick_parents >= percentage_of_population and not (len(parents) == 2) and population not in seen_population_list:
+                    parents.append(population)
+                    seen_population_list.append(population)
+                    max_percent -= percentage_of_population
 
     return parents
 
