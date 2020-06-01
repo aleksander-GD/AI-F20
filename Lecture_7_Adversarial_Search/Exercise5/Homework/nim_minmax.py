@@ -24,7 +24,7 @@ def minmax_decision(state):
 def is_terminal(state):
     no_options = True
     for entry in state:
-        if entry > 2:  # hvis bunken er større end 2, kan man stadig dele bunken.
+        if entry > 2:
             no_options = False
             break
 
@@ -91,6 +91,7 @@ def display(state):
 
 def main():
     board = [15]
+    # board = [20]
     while not is_terminal(board):
         board = computer_select_pile(board)
         if not is_terminal(board):

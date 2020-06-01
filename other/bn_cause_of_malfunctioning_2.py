@@ -124,59 +124,28 @@ class Variable(object):
         this function should be call before any other calculation is done.
 
         """
+
         # return, if already done
         if self.ready:
             return
 
-        # COMPLETE THIS FUNCTION
-        # Set self.marginal_probabilities
-        sumRow = 0
-        sumColumn = 0
-        sumColumn2 = 0
-        probability_tuple_list = []
-        current_probability_distribution_table = {}
-        marginal_of_node = {}
-        probability_list = []
-        for assignment, probability_values in self.probability_table.items():
-            # print(assignment)
-            # print(probability_value)
-            if not self.parents:
-                probability_list = list(probability_values)
-                self.marginal_probabilities = probability_list
-                self.marginal.append(probability_list)
-                return
+        if len(self.parents) == 0:
+            self.marginal_probabilities = self.probability_table[list(self.probability_table.keys())[0]]
+        else:
+            # for each row in probability table
+            for key, v in self.probability_table.items():
+                # marginal probability of parents, assume parents are
+                # independent
+                parents_probability_array = [
+                    parent.get_marginal_probability(k)
+                    for parent, k in zip(self.parents, key)
+                ]
 
-            if self.parents:
-                probability_tuple_list.append(probability_values)
-                # for row_entry in probability_values:
-                append_dict = {assignment[0]: probability_values}
-                current_probability_distribution_table.update(append_dict)
-        for parent in self.get_parents():
-            for margin in list(parent.marginal):
-                probability_list.append(margin)
+                parents_probability = multiply_vector_elements(parents_probability_array)
 
-        row_one_column_one = 0
-        row_one_column_two = 0
-        row_two_column_two = 0
-        row_two_column_one = 0
-        row_value_one = 0
-        row_value_two = 0
-        for value in probability_list:
-            row_value_one = value[0]
-            row_value_two = value[1]
-        for assignment, probability in current_probability_distribution_table.items():
-            if assignment.lower() == 'false':
-                row_one_column_one = probability[0]
-                row_one_column_two = probability[1]
-            if assignment.lower() == 'true':
-                row_two_column_two = probability[1]
-                row_two_column_one = probability[0]
+                self.marginal_probabilities = [self.marginal_probabilities[j] + v[j]*parents_probability for j in range(len(self.assignments))]
 
-        false_sum = row_one_column_one * row_value_one + (row_two_column_one * row_value_two)
-        true_sum = row_one_column_two * row_value_one + (row_two_column_two * row_value_two)
-
-        self.marginal_probabilities = [false_sum, true_sum]
-        self.marginal.append([false_sum, true_sum])
+        # set this Node`s state to ready
         self.ready = True
 
     def get_marginal_probability(self, val):
@@ -270,52 +239,12 @@ class BayesianNetwork(object):
     def get_joint_probability(self, values):
         """ return the joint probability of the Nodes """
 
-        value_dict = {}
-
-        for value in values:
-            if value in self.varsMap:
-                variable = self.varsMap[value]
-                name = variable.get_name()
-                index = variable.get_assignment_index(
-                    values[value])
-                parents = variable.get_parents()
-                if parents:
-                    if len(parents) > 1:
-                        assignment_key = []
-                        for parent in parents:
-                            parentName = parent.get_name()
-                            parentIndex = parent.get_assignment_index(values[parentName])
-                            assignment = parent.get_assignments()
-                            for boolean, assignment_index in assignment.items():
-                                if assignment_index == parentIndex:
-                                    assignment_key.append(boolean)
-                        probability = variable.probability_table
-                        numbers = probability[tuple(assignment_key)]
-                        prob = numbers[index]
-                        value_dict[name] = prob
-                    else:
-                        for parent in parents:
-                            probability = variable.probability_table
-                            parentName = parent.get_name()
-                            parentIndex = parent.get_assignment_index(values[parentName])
-
-                            key = list(probability)[parentIndex]
-                            numbers = probability[key]
-                            prob = numbers[index]
-                            value_dict[name] = prob
-                else:
-                    index = 0
-                    probability = variable.probability_table
-                    key = list(probability)[index - 1]
-                    numbers = probability[key]
-                    prob = numbers[index]
-                    value_dict[name] = prob
-
-        result = 1
-        for value in value_dict:
-            result = result * value_dict[value]
-
-        return result
+        joint = 1
+        for var in reversed(self.variables):
+            var_value = values[var.name]
+            parents_values = self.sub_vals(var, values)
+            joint = joint * var.get_probability(var_value, parents_values)
+        return joint
 
     def get_conditional_probability(self, values, evidents):
         """ returns the conditional probability.
@@ -446,9 +375,6 @@ def car():
     t1 = {(): (0.7, 0.3)}
     t2 = {(): (0.8, 0.2)}
     t3 = {(): (0.7, 0.3)}
-    # t1 = {('false'): (0.7), ('true'): (0.3)}
-    # t2 = {('false'): (0.8), ('true'): (0.2)}
-    # t3 = {('false'): (0.7), ('true'): (0.3)}
     t4 = {('false',): (0.9, 0.1), ('true',): (0.3, 0.7)}
     t5 = {
         ('false', 'false'): (0.3, 0.7),

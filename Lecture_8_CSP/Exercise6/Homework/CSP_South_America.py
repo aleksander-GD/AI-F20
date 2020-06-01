@@ -59,7 +59,7 @@ class CSP:
 
 def create_australia_csp():
     wa, q, t, v, sa, nt, nsw = 'WA', 'Q', 'T', 'V', 'SA', 'NT', 'NSW'
-    values = ['Red', 'Green', 'Blue']
+    values = ['Red', 'Green', 'Blue', 'Yellow']
     variables = [wa, q, t, v, sa, nt, nsw]
     domains = {
         wa: values[:],
@@ -118,8 +118,6 @@ def create_south_america_csp():
         chl: values[:],
     }
     neighbours = {
-        # wa: [sa, nt],
-        # t: [],
         cri: [pan],
         pan: [cri, col],
         col: [pan, ecu, per, ven, bra],
@@ -162,7 +160,6 @@ def create_south_america_csp():
 
 
 if __name__ == '__main__':
-    # sys.setrecursionlimit(100000)
     australia = create_australia_csp()
     result = australia.backtracking_search()
     print('\nCSP for australia: ')
@@ -174,4 +171,3 @@ if __name__ == '__main__':
     for area, color in sorted(result.items()):
         print("{}: {}".format(area, color))
 
-    # Check at https://mapchart.net/australia.html

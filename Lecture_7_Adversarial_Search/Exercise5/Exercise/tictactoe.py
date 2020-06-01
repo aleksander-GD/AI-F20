@@ -22,16 +22,16 @@ def minmax_decision(state):
 
 
 def is_terminal(state):
-    board_is_full = True  # starter med at sætte et fuldt bræt
-    for i in range(len(state)):  # looper igennem længden af state og hvis det ikke er fyldt med X eller O er det ikke fyldt
+    board_is_full = True
+    for i in range(len(state)):
         if state[i] != 'O' and state[i] != 'X':
             board_is_full = False
             break
 
-    if board_is_full:  # returnerer hvis brættet er fyldt
+    if board_is_full:
         return True
 
-    utility = utility_of(state)  # bruger resultatet af utility_of(state) til at se om der er vundet eller tabt, ellers returneres false.
+    utility = utility_of(state)
     if utility == 1 or utility == -1:
         return True
     else:
@@ -88,15 +88,17 @@ def utility_of(state):
             return -1
     return 0
 
+
 def check_players_turn(state):
     count = 0
 
     for board_entry in state:
-        if board_entry == 'O' or board_entry == 'X': # Hvis den finder et O eller X så springer den pladsen over
+        if board_entry == 'O' or board_entry == 'X':
             continue
         count += 1
     if count % 2 == 1:
         return True
+
 
 def successors_of(state):
     """
@@ -105,10 +107,8 @@ def successors_of(state):
    :return:
    """
 
-    # Figure out whos' turn it is. if count uneven, X turn.
-
     # Generate valid moves:
-    max_turn = check_players_turn(state) # Check whos turn it is, if the count is uneven, then it will be Xs turn
+    max_turn = check_players_turn(state)
     valid_moves = []
     for state_index in range(len(state)):
         if state[state_index] == 'O' or state[state_index] == 'X':
@@ -116,9 +116,6 @@ def successors_of(state):
         new_state = state.copy()
         new_state[state_index] = 'X' if max_turn else 'O'
         valid_moves.append((state_index, new_state))
-
-
-
     return valid_moves
 
 

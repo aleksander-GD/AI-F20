@@ -24,7 +24,7 @@ def minmax_decision(state):
 def is_terminal(state):
     no_options = True
     for entry in state:
-        if entry > 2:  # hvis bunken er større end 2, kan man stadig dele bunken.
+        if entry > 2:
             no_options = False
             break
 

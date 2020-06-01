@@ -7,7 +7,7 @@ def multiply_vector_elements(vector):
     """ return the multiplication of the vector elements """
 
     def mult(x, y):
-        return x*y
+        return x * y
 
     return functools.reduce(mult, vector, 1)
 
@@ -134,7 +134,7 @@ class Variable(object):
                 parents_probability = multiply_vector_elements(parents_probability_array)
 
                 self.marginal_probabilities = [
-                    self.marginal_probabilities[j] + v[j]*parents_probability
+                    self.marginal_probabilities[j] + v[j] * parents_probability
                     for j in range(len(self.assignments))
                 ]
 
@@ -174,9 +174,9 @@ class BayesianNetwork(object):
 
     def __init__(self):
         """ Initialize connectivity matrix. """
-        self.variables = []     # list of variables (Nodes)
-        self.varsMap = {}       # a mapping of variable name to the actual node, for easy access
-        self.ready = False          # indication of this net state
+        self.variables = []  # list of variables (Nodes)
+        self.varsMap = {}  # a mapping of variable name to the actual node, for easy access
+        self.ready = False  # indication of this net state
 
     def calculate_marginal_probabilities(self):
         """ pre-calculate and stores the marginal probabilities of all the nodes """
@@ -277,13 +277,16 @@ class BayesianNetwork(object):
                 k = list(values.keys())[0]
                 complementary_conditional_values = values.copy()
                 complementary_conditional_values[k] = 'false' if values[k] == 'true' else 'true'
-                marginal_of_evidents = marginal_of_evidents * self.varsMap[child].get_conditional_probability(c_val, complementary_conditional_values)
+                marginal_of_evidents = marginal_of_evidents * self.varsMap[child].get_conditional_probability(c_val,
+                                                                                                              complementary_conditional_values)
 
                 # print("Child: {}".format(child))
                 # print("    Given: {}".format(complementary_conditional_values))
 
             # uses Bayes rule, for calculating the conditional probability
-            res = (joint_conditional_children * joint_marginal_parents) / ((joint_conditional_children * joint_marginal_parents) + marginal_of_evidents * (1 - joint_marginal_parents))
+            res = (joint_conditional_children * joint_marginal_parents) / (
+                        (joint_conditional_children * joint_marginal_parents) + marginal_of_evidents * (
+                            1 - joint_marginal_parents))
 
         return res
 
@@ -356,24 +359,36 @@ def print_marginal_probabilities(network):
 
 def sprinkler():
     # the values kept as dictionary
-    t1 = {(): (0.5, 0.5)}
-    t2 = {('false',): (0.5, 0.5), ('true',): (0.9, 0.1)}
-    t3 = {('false',): (0.8, 0.2), ('true',): (0.2, 0.8)}
-    t4 = {
-        ('false', 'false'): (1, 0),
-        ('true', 'false'): (0.1, 0.9),
-        ('false', 'true'): (0.1, 0.9),
-        ('true', 'true'): (0.01, 0.99)
+    t1 = {(): (0.7, 0.3)}
+    t2 = {(): (0.8, 0.2)}
+    t3 = {(): (0.7, 0.3)}
+    t4 = {('false',): (0.9, 0.1), ('true',): (0.3, 0.7)}
+    t5 = {
+        ('false', 'false'): (0.3, 0.7),
+        ('true', 'false'): (0.4, 0.6),
+        ('false', 'true'): (0.7, 0.3),
+        ('true', 'true'): (0.95, 0.05)
     }
+    t6 = {
+        ('false', 'false', 'false'): (0.99, 0.01),
+        ('false', 'false', 'true'): (0.9, 0.1),
+        ('false', 'true', 'false'): (0.5, 0.5),
+        ('false', 'true', 'true'): (0.4, 0.6),
+        ('true', 'false', 'false'): (0.8, 0.2),
+        ('true', 'false', 'true'): (0.7, 0.3),
+        ('true', 'true', 'false'): (0.2, 0.8),
+        ('true', 'true', 'true'): (0.1, 0.9)
+    }
+    damaged_tire = Variable('Damaged Tire (DT)', ('false', 'true'), t1, [])
+    electronics_malfunctioning = Variable('Electronics Malfunctioning (EM)', ('false', 'true'), t3, [])
+    fuel_tank_leaking = Variable('Fuel Tank Leaking (FTL)', ('false', 'true'), t2, [])
+    vibrations = Variable('Vibrations (V)', ('false', 'true'), t4, [damaged_tire])
+    slow_max_speed = Variable('Slow Max Speed (SMS)', ('false', 'true'), t5, [damaged_tire, electronics_malfunctioning])
+    high_consumption = Variable('High Consumption (HC)', ('false', 'true'), t6,
+                                [damaged_tire, electronics_malfunctioning, fuel_tank_leaking])
 
-    # creation of Nodes objects
-    cloudy = Variable('Cloudy', ('false', 'true'), t1)
-    sprinkler = Variable('Sprinkler', ('false', 'true'), t2, [cloudy])
-    rain = Variable('Rain', ('false', 'true'), t3, [cloudy])
-    wetgrass = Variable('WetGrass', ('false', 'true'), t4, [sprinkler, rain])
-
-    variables = [cloudy, sprinkler, rain, wetgrass]
-
+    variables = [damaged_tire, electronics_malfunctioning, fuel_tank_leaking, vibrations, slow_max_speed,
+                 high_consumption]
     # creation of Network
     network = BayesianNetwork()
     network.set_variables(variables)
@@ -386,17 +401,20 @@ def sprinkler():
     print('')
 
     joint_values = {
-        'Sprinkler': 'true',
-        'Cloudy': 'false',
-        'WetGrass': 'true',
-        'Rain': 'false'
+        'Damaged Tire (DT)': 'true',
+        'Electronics Malfunctioning (EM)': 'false',
+        'Fuel Tank Leaking (FTL)': 'true',
+        'Vibrations (V)': 'true',
+        'Slow Max Speed (SMS)': 'true',
+        'High Consumption (HC)': 'false'
     }
     print_joint_probability(network, joint_values)
 
     print('')
 
-    conditionals_vars = {'Sprinkler': 'true'}
-    conditionals_evidents = {'WetGrass': 'true'}
+    conditionals_vars = {'Damaged Tire (DT)': 'true', 'Electronics Malfunctioning (EM)': 'false',
+                         'Fuel Tank Leaking (FTL)': 'true'}  # ?
+    conditionals_evidents = {'Vibrations (V)': 'true', 'Slow Max Speed (SMS)': 'true', 'High Consumption (HC)': 'false'}
 
     print_conditional_probability(network, conditionals_vars, conditionals_evidents)
 

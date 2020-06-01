@@ -2,10 +2,6 @@ import random
 
 from Lecture_6_Local_Search.Exercise4.Homework import queens_fitness
 
-# import sys
-# sys.path.insert(0, '/Lecture_6')
-
-
 p_mutation = 4
 num_of_generations = 30
 
@@ -104,7 +100,6 @@ def random_selection(population, fitness_fn):
     # list.
     ordered_population = list(population)
 
-    # https://en.wikipedia.org/wiki/Fitness_proportionate_selection
     fitness_of_each = {}
     sum_of_fitness = 0
 
@@ -114,8 +109,7 @@ def random_selection(population, fitness_fn):
     percentage_of_each = {}
     parents = []
 
-    for population, fitness in sorted(fitness_of_each.items(), key=lambda x: x[1],
-                                      reverse=True):  # sort dict before loop, descending
+    for population, fitness in sorted(fitness_of_each.items(), key=lambda x: x[1], reverse=True):
         percentage_of_each[
             population] = fitness / sum_of_fitness * 100
     seen_population_list = []
@@ -130,7 +124,8 @@ def random_selection(population, fitness_fn):
         else:
             for population, percentage_of_population in percentage_of_each.items():
                 pick_parents = random.uniform(min_percent, max_percent)
-                if pick_parents >= percentage_of_population and not (len(parents) == 2) and population not in seen_population_list:
+                if pick_parents >= percentage_of_population and not (
+                        len(parents) == 2) and population not in seen_population_list:
                     parents.append(population)
                     seen_population_list.append(population)
                     max_percent -= percentage_of_population
