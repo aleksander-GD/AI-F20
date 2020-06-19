@@ -244,11 +244,11 @@ class BayesianNetwork(object):
         res = 1
 
         # when we want probability of children given their parents
-        # if self.varsMap[list(values.keys())[0]].is_child_of(self.varsMap[list(evidents.keys())[0]]):
-        if all(self.varsMap[list(values.keys())[0]].is_child_of(self.varsMap[evident]) for evident in evidents.keys()):
-            # print('probability of children given their parents')
-            for child, c_val in values.items():
-                res *= self.varsMap[child].get_conditional_probability(c_val, evidents)
+        if self.varsMap[list(values.keys())[0]].is_child_of(self.varsMap[list(evidents.keys())[0]]):
+            if all(self.varsMap[list(values.keys())[0]].is_child_of(self.varsMap[evident]) for evident in evidents.keys()):
+                print('probability of children given their parents')
+                for child, c_val in values.items():
+                    res *= self.varsMap[child].get_conditional_probability(c_val, evidents)
 
         # when we want probability of parents given their children
         # make use of Bayes rule
@@ -285,8 +285,8 @@ class BayesianNetwork(object):
 
             # uses Bayes rule, for calculating the conditional probability
             res = (joint_conditional_children * joint_marginal_parents) / (
-                        (joint_conditional_children * joint_marginal_parents) + marginal_of_evidents * (
-                            1 - joint_marginal_parents))
+                    (joint_conditional_children * joint_marginal_parents) + marginal_of_evidents * (
+                    1 - joint_marginal_parents))
 
         return res
 
@@ -385,7 +385,7 @@ def sprinkler():
     vibrations = Variable('Vibrations (V)', ('false', 'true'), t4, [damaged_tire])
     slow_max_speed = Variable('Slow Max Speed (SMS)', ('false', 'true'), t5, [damaged_tire, electronics_malfunctioning])
     high_consumption = Variable('High Consumption (HC)', ('false', 'true'), t6,
-                                [damaged_tire, electronics_malfunctioning, fuel_tank_leaking])
+                                [damaged_tire, fuel_tank_leaking, electronics_malfunctioning])
 
     variables = [damaged_tire, electronics_malfunctioning, fuel_tank_leaking, vibrations, slow_max_speed,
                  high_consumption]
@@ -412,9 +412,8 @@ def sprinkler():
 
     print('')
 
-    conditionals_vars = {'Damaged Tire (DT)': 'true', 'Electronics Malfunctioning (EM)': 'false',
-                         'Fuel Tank Leaking (FTL)': 'true'}  # ?
-    conditionals_evidents = {'Vibrations (V)': 'true', 'Slow Max Speed (SMS)': 'true', 'High Consumption (HC)': 'false'}
+    conditionals_vars = {'Fuel Tank Leaking (FTL)': 'true'}  # ?
+    conditionals_evidents = {'High Consumption (HC)': 'true'}
 
     print_conditional_probability(network, conditionals_vars, conditionals_evidents)
 

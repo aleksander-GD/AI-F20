@@ -48,7 +48,7 @@ def EXPAND(node):
     successors = []
     calculatedlist = []
     children = successor_fn(node.STATE)
-    children.append(node.STATE) # tilføjer også den vi kommer fra til child listen
+    children.append(node.STATE)  # tilføjer også den vi kommer fra til child listen
     for child in children:
         s = Node(node)  # create node for each in state list
         s.STATE = child  # e.g. result = 'F' then 'G' from list ['F', 'G']
@@ -56,10 +56,12 @@ def EXPAND(node):
         s.DEPTH = node.DEPTH + 1
         successors = INSERT(s, successors)
     for entry in successors:
-        if entry.STATE[0] in [closed_item[0] for closed_item in VISITED]: # hvis noden har været besøgt, ignorer og fortsæt
+        if entry.STATE[0] in [closed_item[0] for closed_item in
+                              VISITED]:  # hvis noden har været besøgt, ignorer og fortsæt
             continue
-        COST.update({entry.STATE[0]: COST[node.STATE[0]] + entry.STATE[1]}) # opdatere node costen (kun med rute cost op til noden)
-        calculatedlist.append(entry) # tilføjer noden til fringe
+        COST.update({entry.STATE[0]: COST[node.STATE[0]] + entry.STATE[
+            1]})  # opdatere node costen (kun med rute cost op til noden)
+        calculatedlist.append(entry)  # tilføjer noden til fringe
     return calculatedlist
 
 
@@ -91,15 +93,20 @@ def INSERT_ALL(list, queue):
 Removes and returns the best element from fringe
 '''
 
+
 # '''
 def REMOVE_BEST(queue):
     fn = []
     for entry in queue:
-        fn_node = COST[entry.STATE[0]] + HEURISTICS[entry.STATE[0]] # udregner hvad noden koster, med rute og heuristic.
+        # udregner hvad noden koster, med rute og heuristic.
+        fn_node = COST[entry.STATE[0]] + HEURISTICS[entry.STATE[0]]
         fn.append(fn_node)
-    chosen_index = fn.index(min(fn))    # finder den minimale cost i listen af noder.
-    VISITED.append(queue[chosen_index].STATE)   # tilføjer den valgte til den besøgte liste
-    return queue.pop(chosen_index)  # returnere og fjerner den valgte node fra fringe
+    # finder den minimale cost i listen af noder.
+    chosen_index = fn.index(min(fn))
+    # tilføjer den valgte til den besøgte liste
+    VISITED.append(queue[chosen_index].STATE)
+    # returnere og fjerner den valgte node fra fringe
+    return queue.pop(chosen_index)
 
 
 # '''
@@ -116,12 +123,12 @@ def successor_fn(state):  # Lookup list of successor states
 
 VISITED = []
 COST = {'A': 0}
-INITIAL_STATE = ('A', 0)
+INITIAL_STATE = ('A', 6)
 GOAL_STATE = [('K'), ('L')]
 STATE_SPACE = {('A'): [('B', 1), ('C', 2), ('D', 4)],
                ('B'): [('F', 5), ('E', 4)],
                ('C'): [('E', 1)],
-               ('D'): [('I', 4), ('J', 2), ('H', 1)],
+               ('D'): [('H', 1), ('I', 4), ('J', 2)],
                ('E'): [('G', 2), ('H', 3)],
                ('F'): [('G', 1)],
                ('G'): [('K', 6)],

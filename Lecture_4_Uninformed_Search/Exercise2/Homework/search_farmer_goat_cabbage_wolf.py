@@ -114,7 +114,7 @@ Return
 Take goat over
 '''
 ILLEGAL_STATE = (
-    ('E', 'W', 'W', 'E'), ('E', 'E', 'W', 'W'), ('E', 'W', 'W', 'E'), ('W', 'W', 'E', 'E'), ('W', 'E', 'E', 'W'), ('E', 'W', 'W', 'W'))
+    ('E', 'W', 'W', 'E'), ('E', 'E', 'W', 'W'), ('E', 'W', 'W', 'E'), ('W', 'E', 'E', 'W'), ('E', 'W', 'W', 'W'))
 INITIAL_STATE = ('W', 'W', 'W', 'W')
 GOAL_STATE = ('E', 'E', 'E', 'E')
 STATE_SPACE = {
@@ -134,8 +134,8 @@ STATE_SPACE = {
 
     ('E', 'W', 'E', 'E'):
         [('E', 'W', 'E', 'E'), ('W', 'W', 'E', 'E'), ('W', 'W', 'W', 'E'), ('W', 'W', 'E', 'W')],
-    #('W', 'W', 'E', 'E'):  # Illegal state
-    #    [('W', 'W', 'E', 'E')],
+    ('W', 'W', 'E', 'E'):  # Illegal state
+        [('W', 'W', 'E', 'E')],
     #('W', 'W', 'E', 'E'):
     #    [('W', 'W', 'E', 'E')],
     ('W', 'W', 'W', 'E'):
